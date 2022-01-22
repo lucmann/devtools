@@ -2,37 +2,107 @@
 # Copyright (C) 2022 Luc Ma <onion0709@gmail.com>
 
 import subprocess
+from abc import abstractmethod
 
 from subprocess import (
     Popen,
     PIPE,
 )
 
-class Deployable:
-    def __init__(self,
-                 tool,                  # type: DevTool
-                 dl_cmd=[],             # type: List[str]
-                 unpack_cmd=[],         # type: List[str]
-                 build_cmd=[],          # type: List[str]
-                 inst_cmd=[],           # type: List[str]
-                 cfg_cmd=[]             # type: List[str]
-                 ):
-        self.tool = tool,
-        self.dl_cmd = dl_cmd,
-        self.unpack_cmd = unpack_cmd;
-        self.build_cmd = build_cmd;
-        self.inst_cmd = inst_cmd;
-        self.cfg_cmd = cfg_cmd;
+class DevToolDescriptor:
+    """
+    Describe the basic information of a dev tool
+    """
 
-class DevTool:
-    def __init__(self, dest_dir, src_url=None):
-        self.dest_dir = dest_dir
-        self.src_url = src_url
+    def __init__(self,
+                 name,
+                 cmd_name,
+                 version,
+                 min_version=None,
+                 url=None,
+                 prefix=None):
+        self.name = name
+        self.cmd_name = cmd_name
+        self.version = version
+        self.min_version = min_version
+        self.url = url
+        self.prefix = prefix
+
+class DevToolDeploy:
+    """
+    A set of abstract operations needed to deploy a dev tool
+    """
+
+    def __init__(self, dtd, uninst=False):
+        self.dtd = dtd                  # type: DevToolDescriptor
+        self.uninst = uninst            # type: bool
+
+    def deploy(self):
+        if self.uninst:
+            self.uninstall()
+        else:
+            if self.exists():
+                pass
+            else:
+                self.download()
+                self.unpack()
+                self.build()
+                self.install()
+                self.configure()
+                self.clean()
+
+    """
+    These operations have to be implemented in the subclasses.
+    """
+
+    @abstractmethod
+    def install(self):
+        pass
+
+    @abstractmethod
+    def uninstall(self):
+        pass
+
+    def exists(self):
+        return False
+
+    def download(self):
+        """
+        Implemented by SourceDevToolDeploy
+        """
+
+        print(f"Downloading ...")
+
+    def unpack(self):
+        """
+        Implemented in the subclass SourceDevToolDeploy
+        """
+
+        pass
+
+    def build(self):
+        pass
+
+    def configure(self):
+        pass
 
     def clean(self):
         pass
 
-class SourceDevTool(DevTool):
-    def __init__(self, src_url, unpack_dir, dest_dir):
-        DevTool.__init__(self, dest_dir, src_url)
-        self.unpack_dir = unpack_dir
+class DTZsh(DevToolDeploy):
+    def __init__(self, dtd, uninst=False):
+        DevToolDeploy.__init__(self, dtd, uninst)
+
+
+def devtool_deploy(dt):
+    dt.deploy()
+
+if __name__ == "__main__":
+    devtool_deploy(DTZsh(
+        DevToolDescriptor(
+            "zsh",
+            "zsh",
+            "",
+            "5.0.8"
+        )
+    ))

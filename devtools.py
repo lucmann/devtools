@@ -190,6 +190,12 @@ class DTZsh(DevToolDeploy):
         """
 
         whoami = os.getlogin()
+        curr_shell = subprocess.check_output(
+            ['grep', '^' + whoami, '/etc/passwd'], universal_newlines=True).strip()
+
+        if curr_shell.endswith("/zsh"):
+            # User's login shell has been zsh
+            return
 
         try:
             first_zsh = subprocess.check_output(

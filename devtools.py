@@ -78,12 +78,11 @@ class DevToolDeploy:
     A set of abstract operations needed to deploy a dev tool
     """
 
-    def __init__(self, dtd, uninst=False):
+    def __init__(self, dtd):
         self.dtd = dtd                  # type: DevToolDescriptor
-        self.uninst = uninst            # type: bool
 
-    def deploy(self):
-        if self.uninst:
+    def deploy(self, uninst):
+        if uninst:
             self.uninstall()
         else:
             if self.exists():
@@ -105,17 +104,24 @@ class DevToolDeploy:
     """
 
     def exists(self):
+        curr_ver_unknown = False
         try:
             # It should work for most of programs on Linux
             proc = Popen([self.dtd.cmd_name, '--version'], stdout=PIPE,
                          stderr=PIPE, text=True)
             (stdout, stderr) = proc.communicate()
 
+            try:
+                self.dtd.curr_version = re.search(r"\d+\.\d+(\.\d+)?",
+                                                  stdout).group(0)
+            except AttributeError:
+                curr_ver_unknown = True
+
             # Do not care the version of program
             if self.dtd.min_version is None:
                 return True
 
-            if proc.returncode != 0:
+            if proc.returncode != 0 or curr_ver_unknown:
                 # It proves the program has existed but probably does not
                 # support the option `--version`.
                 # A minimum version is required but the current version is
@@ -123,9 +129,6 @@ class DevToolDeploy:
                 # reinstall
                 return False
             else:
-                self.dtd.curr_version = re.search(r"\d+\.\d+(\.\d+)?",
-                                                  stdout).group(0)
-
                 if DTUtils.version_lt(self.dtd.curr_version,
                                       self.dtd.min_version):
                     return False
@@ -172,9 +175,14 @@ class DevToolDeploy:
             pr_failure(f"Failed to apt-get purge {self.dtd.name}")
 
 
+class DTGit(DevToolDeploy):
+    def __init__(self, dtd):
+        DevToolDeploy.__init__(self, dtd)
+
+
 class DTZsh(DevToolDeploy):
-    def __init__(self, dtd, uninst=False):
-        DevToolDeploy.__init__(self, dtd, uninst)
+    def __init__(self, dtd):
+        DevToolDeploy.__init__(self, dtd)
 
     def configure(self):
         """
@@ -199,8 +207,23 @@ class DTZsh(DevToolDeploy):
             pr_failure(f"Failed to change login shell for {whoami}")
 
 
-def devtool_deploy(dt):
-    dt.deploy()
+class DTOmz(DevToolDeploy):
+    """
+    Oh My Zsh for managing your zsh configuration
+    """
+
+    def __init__(self, dtd):
+        DevToolDeploy.__init__(self, dtd)
+
+    def download(self):
+        try:
+            pass
+        except:
+            pass
+
+
+def devtool_deploy(dt, uninst):
+    dt.deploy(uninst)
 
 
 if __name__ == "__main__":
@@ -210,12 +233,20 @@ if __name__ == "__main__":
 
     args = DTUtils.parseArgs()
 
-    devtool_deploy(DTZsh(
-        DevToolDescriptor(
+    dt_list = [
+        DTGit(DevToolDescriptor(
+            "git",
+            "git",
+            ""
+        )),
+
+        DTZsh(DevToolDescriptor(
             "zsh",
             "zsh",
             "",
             "5.0.8"
-        )
-        , args.uninst
-    ))
+        )),
+    ]
+
+    for dt in dt_list:
+        devtool_deploy(dt, args.uninst);

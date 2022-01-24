@@ -15,6 +15,7 @@ from subprocess import (
     PIPE,
 )
 
+
 if os.geteuid() == 0:
     WHOAMI = os.getenv("SUDO_USER")
 else:
@@ -24,11 +25,19 @@ HOME = os.path.join("/home", WHOAMI)
 
 
 class bcolors:
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    OK = '\033[90m'
-    FAIL = '\033[91m'
-    WARNING = '\033[93m'
+    ENDC        = '\033[0m'
+    BOLD        = '\033[1m'
+    GREY        = '\033[90m'
+    RED         = '\033[91m'
+    GREEN       = '\033[92m'
+    YELLOW      = '\033[93m'
+    BLUE        = '\033[94m'
+    PINK        = '\033[95m'
+    TURQUOISE   = '\033[96m'
+
+    OK          = GREEN
+    WARNING     = YELLOW
+    FAIL        = RED
 
 def pr_warning(s):
     print(f"{bcolors.WARNING}{s}{bcolors.ENDC}")
@@ -106,7 +115,7 @@ class DevToolDeploy:
             self.uninstall()
         else:
             if self.exists():
-                pr_okay(f"{self.dtd.name} {self.dtd.curr_version}")
+                pr_okay(f"{self.dtd.name} {self.dtd.curr_version} has existed")
             else:
                 if not self.download():
                     return

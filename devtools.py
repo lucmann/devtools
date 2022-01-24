@@ -22,6 +22,7 @@ else:
 
 HOME = os.path.join("/home", WHOAMI)
 
+
 class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
@@ -93,11 +94,13 @@ class DevToolDeploy:
         self.dtd = dtd                  # type: DevToolDescriptor
 
     def deploy(self, uninst):
-        if self.need_root() and os.getuid() != 0:
-            pr_failure(f"You need to be root to run this application")
-            sys.exit(1)
-        elif os.getuid() == 0:
-            pr_warning(f"You are privileged but don't have to")
+        if self.need_root():
+            if os.getuid() != 0:
+                pr_failure(f"You need to be root to run this application")
+                sys.exit(1)
+        else:
+            if os.getuid() == 0:
+                pr_warning(f"You are privileged but don't have to")
 
         if uninst:
             self.uninstall()

@@ -15,7 +15,11 @@ from subprocess import (
     PIPE,
 )
 
-WHOAMI = os.getlogin()
+if os.geteuid() == 0:
+    WHOAMI = os.getenv("SUDO_USER")
+else:
+    WHOAMI = os.getenv("USER")
+
 HOME = os.path.join("/home", WHOAMI)
 
 class bcolors:

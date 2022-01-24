@@ -72,6 +72,21 @@ class DTUtils:
 
         return parser.parse_args()
 
+    @staticmethod
+    def git_shallow_clone(dtd):
+        try:
+            proc = Popen(['git', 'clone', '--depth', '1', dtd.url, dtd.prefix])
+            (stdout, stderr) = proc.communicate()
+
+            if proc.returncode == 0:
+                return True
+            else:
+                pr_failure(f"Failed to git clone {dtd.url}")
+                return False
+        except:
+            pr_failure(f"Failed to git clone {dtd.url}")
+            return False
+
 
 class DevToolDescriptor:
     """
@@ -265,18 +280,7 @@ class DTOhMyZsh(DevToolDeploy):
             return False
 
     def download(self):
-        try:
-            proc = Popen(['git', 'clone', self.dtd.url, self.dtd.prefix])
-            (stdout, stderr) = proc.communicate()
-
-            if proc.returncode == 0:
-                return True
-            else:
-                pr_failure(f"Failed to git clone {self.dtd.url}")
-                return False
-        except:
-            pr_failure(f"Failed to git clone {self.dtd.url}")
-            return False
+        return DTUtils.git_shallow_clone(self.dtd)
 
     def install(self):
         pass

@@ -308,6 +308,7 @@ class DTOhMyZsh(DevToolDeploy):
             yes_p = Popen(['yes'], stdout=PIPE)
             uninst_proc = Popen([oh_my_zsh_uninst], stdin=yes_p.stdout,
                                 shell=True, universal_newlines=True)
+            (stdout, stderr) = uninst_proc.communicate()
         except (KeyError, FileNotFoundError):
             # No oh-my-zsh to uninstall
             pass

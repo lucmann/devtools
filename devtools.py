@@ -127,7 +127,10 @@ class DevToolDeploy:
                 pr_warning(f"You are privileged but don't have to")
 
         if uninst:
-            self.uninstall()
+            if self.exists():
+                self.uninstall()
+            else:
+                pr_warning(f"{self.dtd.name} not installed yet")
         else:
             if self.exists():
                 pr_okay(f"{self.dtd.name} {self.dtd.curr_version} has existed")
@@ -314,6 +317,54 @@ class DTOhMyZsh(DevToolDeploy):
             pass
 
 
+class DTVimrc(DevToolDeploy):
+    """
+    The ultimate Vim configuration
+    """
+
+    def __init__(self, dtd):
+        DevToolDeploy.__init__(self, dtd)
+        self.rc = os.path.join(HOME, ".vimrc")
+        self.rc_bak = os.path.join(HOME, '.vimrc.orig')
+
+    def need_root(self):
+        return False
+
+    def exists(self):
+        if os.path.exists(self.dtd.prefix):
+            return True
+        else:
+            return False
+
+    def download(self):
+        return DTUtils.git_shallow_clone(self.dtd)
+
+    def install(self):
+        vimrc_installer = os.path.join(self.dtd.prefix,
+                                       "install_awesome_vimrc.sh")
+
+        # Optionally backup your existing ~/.vimrc file
+        if os.path.exists(self.rc):
+            shutil.copyfile(self.rc, self.rc_bak)
+
+        try:
+            inst_proc = Popen([vimrc_installer], shell=True)
+            (stdout, stderr) = inst_proc.communicate()
+        except:
+            pr_failure(f"Failed to install {self.dtd.name}")
+
+    def configure(self):
+        pass
+
+    def uninstall(self):
+        shutil.rmtree(self.dtd.prefix, ignore_errors=True)
+
+        if os.path.exists(self.rc_bak):
+            shutil.move(self.rc_bak, self.rc)
+        else:
+            os.remove(self.rc)
+
+
 def devtool_deploy(dt, uninst):
     dt.deploy(uninst)
 
@@ -342,6 +393,15 @@ if __name__ == "__main__":
             "",
             "git@github.com:ohmyzsh/ohmyzsh.git",
             os.path.join(HOME, ".oh-my-zsh")
+        )),
+
+        DTVimrc(DevToolDescriptor(
+            "vimrc",
+            "vimrc",
+            "",
+            "",
+            "git@github.com:amix/vimrc.git",
+            os.path.join(HOME, ".vim_runtime")
         )),
     ]
 

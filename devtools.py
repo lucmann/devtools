@@ -99,7 +99,8 @@ class DevToolDescriptor:
                  version,
                  min_version=None,
                  url=None,
-                 prefix=None):
+                 prefix=None,
+                 platform='linux'):
         self.name = name
         self.cmd_name = cmd_name
         self.version = version
@@ -107,6 +108,7 @@ class DevToolDescriptor:
         self.curr_version = ""
         self.url = url
         self.prefix = prefix
+        self.platform = platform            # 'linux' or 'win32'
 
 
 class DevToolDeploy:
@@ -222,6 +224,36 @@ class DevToolDeploy:
             (stdout, stderr) = proc.communicate()
         except Exception:
             pr_failure(f"Failed to apt-get purge {self.dtd.name}")
+
+
+class DTAutojump(DevToolDeploy):
+    def __init__(self, dtd):
+        DevToolDeploy.__init__(self, dtd)
+
+    def configure(self):
+        oh_my_zsh_root = os.path.join(HOME, ".oh-my-zsh")
+        zshrc = os.path.join(HOME, ".zshrc")
+
+        # Nothing to do if oh-my-zsh not installed
+        if not os.path.exists(oh_my_zsh_root):
+            return
+
+        test_j = Popen(['grep', '-E', '^plugins=(.*autojump.*)', zshrc],
+                       stdout=PIPE, stderr=PIPE)
+        (stdout, stderr) = test_j.communicate()
+
+        if test_j.returncode == 0:
+            pr_okay(f"{self.dtd.name} has existed among zsh plugins")
+            return
+
+        try:
+            add_zsh_plugin = Popen(['sed', '-i', 's/plugins=(/&autojump /', zshrc])
+            (stdout, stderr) = add_zsh_plugin.communicate()
+
+            if add_zsh_plugin_proc.returncode == 0:
+                pr_okay(f"{zshrc} updated, please open a new terminal")
+        except:
+            pr_failure(f"Failed to add {self.dtd.name} to zsh plugins")
 
 
 class DTGit(DevToolDeploy):
@@ -373,6 +405,12 @@ if __name__ == "__main__":
     args = DTUtils.parseArgs()
 
     dt_list = [
+        DTAutojump(DevToolDescriptor(
+            "autojump",
+            "autojump",
+            ""
+        )),
+
         DTGit(DevToolDescriptor(
             "git",
             "git",

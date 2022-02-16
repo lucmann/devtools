@@ -75,7 +75,13 @@ class DTUtils:
     @staticmethod
     def git_shallow_clone(dtd):
         try:
-            proc = Popen(['git', 'clone', '--depth', '1', dtd.url, dtd.prefix])
+            if len(dtd.branch) == 0:
+                proc = Popen(['git', 'clone', '--depth', '1', dtd.url,
+                              dtd.prefix])
+            else:
+                proc = Popen(['git', 'clone', '--depth', '1', '--branch',
+                              dtd.branch, dtd.url, dtd.prefix])
+
             (stdout, stderr) = proc.communicate()
 
             if proc.returncode == 0:
@@ -99,6 +105,7 @@ class DevToolDescriptor:
                  version,
                  min_version=None,
                  url=None,
+                 branch='',
                  prefix=None,
                  platform='linux'):
         self.name = name
@@ -107,6 +114,7 @@ class DevToolDescriptor:
         self.min_version = min_version
         self.curr_version = ""
         self.url = url
+        self.branch = branch                # Optional, source git branch
         self.prefix = prefix
         self.platform = platform            # 'linux' or 'win32'
 
@@ -463,6 +471,7 @@ if __name__ == "__main__":
             "",
             "",
             "git@github.com:ohmyzsh/ohmyzsh.git",
+            "",
             os.path.join(HOME, ".oh-my-zsh")
         )),
 
@@ -471,7 +480,8 @@ if __name__ == "__main__":
             "vimrc",
             "",
             "",
-            "git@github.com:amix/vimrc.git",
+            "git@github.com:lucmann/vimrc.git",
+            "cscope-maps",
             os.path.join(HOME, ".vim_runtime")
         )),
     ]

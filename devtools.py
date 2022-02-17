@@ -264,12 +264,22 @@ class DTAutojump(DevToolDeploy):
             pr_failure(f"Failed to add {self.dtd.name} to zsh plugins")
 
 
+class DTCmake(DevToolDeploy):
+    def __init__(self, dtd):
+        DevToolDeploy.__init__(self, dtd)
+
+
 class DTCscope(DevToolDeploy):
     def __init__(self, dtd):
         DevToolDeploy.__init__(self, dtd)
 
 
 class DTGcc(DevToolDeploy):
+    def __init__(self, dtd):
+        DevToolDeploy.__init__(self, dtd)
+
+
+class DTGpp(DevToolDeploy):
     def __init__(self, dtd):
         DevToolDeploy.__init__(self, dtd)
 
@@ -434,6 +444,12 @@ if __name__ == "__main__":
             ""
         )),
 
+        DTCmake(DevToolDescriptor(
+            "cmake",
+            "cmake",
+            ""
+        )),
+
         DTCscope(DevToolDescriptor(
             "cscope",
             "cscope",
@@ -443,6 +459,12 @@ if __name__ == "__main__":
         DTGcc(DevToolDescriptor(
             "gcc",
             "gcc",
+            ""
+        )),
+
+        DTGpp(DevToolDescriptor(
+            "g++",
+            "g++",
             ""
         )),
 

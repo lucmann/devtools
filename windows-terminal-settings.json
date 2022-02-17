@@ -51,7 +51,7 @@
                 "hidden": false,
                 "name": "Ubuntu-20.04",
                 "source": "Windows.Terminal.Wsl",
-                "startingDirectory": "//wsl$/Ubuntu-20.04/home/luc",
+                "startingDirectory": "\\\\wsl$\\Ubuntu-20.04\\home\\luc",
                 "suppressApplicationTitle": true
             },
             {
@@ -65,7 +65,7 @@
                 "hidden": false,
                 "name": "CentOS7",
                 "source": "Windows.Terminal.Wsl",
-                "startingDirectory": "//wsl$/CentOS7/home/luc",
+                "startingDirectory": "\\\\wsl$\\CentOS7\\home\\luc",
                 "suppressApplicationTitle": true
             },
             {

@@ -294,6 +294,11 @@ class DTGit(DevToolDeploy):
         DevToolDeploy.__init__(self, dtd)
 
 
+class DTMeson(DevToolDeploy):
+    def __init__(self, dtd):
+        DevToolDeploy.__init__(self, dtd)
+
+
 class DTZsh(DevToolDeploy):
     def __init__(self, dtd):
         DevToolDeploy.__init__(self, dtd)
@@ -477,6 +482,12 @@ if __name__ == "__main__":
         DTGit(DevToolDescriptor(
             "git",
             "git",
+            ""
+        )),
+
+        DTMeson(DevToolDescriptor(
+            "meson",
+            "meson",
             ""
         )),
 

@@ -299,6 +299,11 @@ class DTMeson(DevToolDeploy):
         DevToolDeploy.__init__(self, dtd)
 
 
+class DTTmux(DevToolDeploy):
+    def __init__(self, dtd):
+        DevToolDeploy.__init__(self, dtd)
+
+
 class DTZsh(DevToolDeploy):
     def __init__(self, dtd):
         DevToolDeploy.__init__(self, dtd)
@@ -506,6 +511,12 @@ if __name__ == "__main__":
             "git@github.com:ohmyzsh/ohmyzsh.git",
             "",
             os.path.join(HOME, ".oh-my-zsh")
+        )),
+
+        DTTmux(DevToolDescriptor(
+            "tmux",
+            "tmux",
+            ""
         )),
 
         DTVimrc(DevToolDescriptor(

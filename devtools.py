@@ -2,6 +2,7 @@
 # Copyright (C) 2022 Luc Ma <onion0709@gmail.com>
 
 import argparse
+import inspect
 import os
 import re
 import shutil
@@ -392,6 +393,55 @@ class DTOhMyZsh(DevToolDeploy):
             pass
 
 
+class DTTpm(DevToolDeploy):
+    """
+    Tmux Plugin Manager
+    """
+
+    def __init__(self, dtd):
+        DevToolDeploy.__init__(self, dtd)
+        self.conf = os.path.join(HOME, ".tmux.conf")
+
+    def need_root(self):
+        """
+        cloned in ~/.tmux/plugins/tpm
+        """
+
+        return False
+
+    def exists(self):
+        if os.path.exists(self.dtd.prefix):
+            return True
+        else:
+            return False
+
+    def download(self):
+        return DTUtils.git_shallow_clone(self.dtd)
+
+    def install(self):
+        pass
+
+    def configure(self):
+        config = """
+            set -g @plugin 'tmux-plugins/tpm'
+            set -g @plugin 'tmux-plugins/tmux-sensible'
+            set -g @plugin 'tmux-plugins/tmux-resurrect'
+
+            run '~/.tmux/plugins/tpm/tpm'
+        """
+
+        try:
+            with open(self.conf, 'a+') as f:
+                f.write(inspect.cleandoc(config))
+        except:
+            pr_failure(f"No such file or directory {self.conf}")
+
+    def uninstall(self):
+        shutil.rmtree(self.dtd.prefix, ignore_errors=True)
+        shutil.rmtree(os.path.join(HOME, ".tmux"), ignore_errors=True)
+        os.remove(self.conf)
+
+
 class DTVimrc(DevToolDeploy):
     """
     The ultimate Vim configuration
@@ -517,6 +567,16 @@ if __name__ == "__main__":
             "tmux",
             "tmux",
             ""
+        )),
+
+        DTTpm(DevToolDescriptor(
+            "tpm",
+            "tpm",
+            "",
+            "",
+            "git@github.com:tmux-plugins/tpm.git",
+            "",
+            os.path.join(HOME, ".tmux", "plugins", "tpm")
         )),
 
         DTVimrc(DevToolDescriptor(

@@ -276,6 +276,11 @@ class DTCscope(DevToolDeploy):
         DevToolDeploy.__init__(self, dtd)
 
 
+class DTCtags(DevToolDeploy):
+    def __init__(self, dtd):
+        DevToolDeploy.__init__(self, dtd)
+
+
 class DTGcc(DevToolDeploy):
     def __init__(self, dtd):
         DevToolDeploy.__init__(self, dtd)
@@ -514,6 +519,12 @@ if __name__ == "__main__":
         DTCscope(DevToolDescriptor(
             "cscope",
             "cscope",
+            ""
+        )),
+
+        DTCscope(DevToolDescriptor(
+            "universal-ctags",
+            "ctags",
             ""
         )),
 

@@ -101,16 +101,17 @@ class DevToolDescriptor:
     """
 
     def __init__(self,
-                 name,
-                 cmd_name,
+                 pkgname,
+                 cmd,
                  version,
                  min_version=None,
                  url=None,
                  branch='',
                  prefix=None,
                  platform='linux'):
-        self.name = name
-        self.cmd_name = cmd_name
+        self.pkgname = pkgname              # deb file name or git repo name
+        self.cmd = cmd                      # executable name as well as args
+                                            # being passed into this script
         self.version = version
         self.min_version = min_version
         self.curr_version = ""
@@ -141,10 +142,10 @@ class DevToolDeploy:
             if self.exists():
                 self.uninstall()
             else:
-                pr_warning(f"{self.dtd.name} not installed yet")
+                pr_warning(f"{self.dtd.cmd} not installed yet")
         else:
             if self.exists():
-                pr_okay(f"{self.dtd.name} {self.dtd.curr_version} has existed")
+                pr_okay(f"{self.dtd.cmd} {self.dtd.curr_version} has existed")
             else:
                 if not self.download():
                     return
@@ -175,7 +176,7 @@ class DevToolDeploy:
         curr_ver_unknown = False
         try:
             # It should work for most of programs on Linux
-            proc = Popen([self.dtd.cmd_name, '--version'], stdout=PIPE,
+            proc = Popen([self.dtd.cmd, '--version'], stdout=PIPE,
                          stderr=PIPE, text=True)
             (stdout, stderr) = proc.communicate()
 
@@ -216,10 +217,10 @@ class DevToolDeploy:
 
     def install(self):
         try:
-            proc = Popen(['apt-get', 'install', '-y', self.dtd.name])
+            proc = Popen(['apt-get', 'install', '-y', self.dtd.pkgname])
             (stdout, stderr) = proc.communicate()
         except Exception:
-            pr_failure(f"Failed to apt-get install {self.dtd.name}")
+            pr_failure(f"Failed to apt-get install {self.dtd.pkgname}")
 
     def configure(self):
         pass
@@ -229,10 +230,10 @@ class DevToolDeploy:
 
     def uninstall(self):
         try:
-            proc = Popen(['apt-get', 'purge', self.dtd.name])
+            proc = Popen(['apt-get', 'purge', self.dtd.pkgname])
             (stdout, stderr) = proc.communicate()
         except Exception:
-            pr_failure(f"Failed to apt-get purge {self.dtd.name}")
+            pr_failure(f"Failed to apt-get purge {self.dtd.pkgname}")
 
 
 class DTAutojump(DevToolDeploy):
@@ -252,7 +253,7 @@ class DTAutojump(DevToolDeploy):
         (stdout, stderr) = test_j.communicate()
 
         if test_j.returncode == 0:
-            pr_okay(f"{self.dtd.name} has existed among zsh plugins")
+            pr_okay(f"{self.dtd.cmd} has existed among zsh plugins")
             return
 
         try:
@@ -262,7 +263,7 @@ class DTAutojump(DevToolDeploy):
             if add_zsh_plugin_proc.returncode == 0:
                 pr_okay(f"{zshrc} updated, please open a new terminal")
         except:
-            pr_failure(f"Failed to add {self.dtd.name} to zsh plugins")
+            pr_failure(f"Failed to add {self.dtd.cmd} to zsh plugins")
 
 
 class DTCmake(DevToolDeploy):
@@ -476,7 +477,7 @@ class DTVimrc(DevToolDeploy):
             inst_proc = Popen([vimrc_installer], shell=True)
             (stdout, stderr) = inst_proc.communicate()
         except:
-            pr_failure(f"Failed to install {self.dtd.name}")
+            pr_failure(f"Failed to install {self.dtd.cmd}")
 
     def configure(self):
         pass
@@ -555,7 +556,7 @@ if __name__ == "__main__":
 
         DTOhMyZsh(DevToolDescriptor(
             "ohmyzsh",
-            "omz",
+            "ohmyzsh",
             "",
             "",
             "git@github.com:ohmyzsh/ohmyzsh.git",
@@ -591,5 +592,5 @@ if __name__ == "__main__":
     ]
 
     for dt in dt_list:
-        if dt.dtd.name in args.dtools:
+        if dt.dtd.cmd in args.dtools:
             devtool_deploy(dt, args.uninst)

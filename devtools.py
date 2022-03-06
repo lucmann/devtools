@@ -290,6 +290,26 @@ class DTCscope(DevToolDeploy):
 class DTCtags(DevToolDeploy):
     def __init__(self, dtd):
         DevToolDeploy.__init__(self, dtd)
+        self.conf = os.path.join(HOME, ".ctags")
+
+    def configure(self):
+        config = """
+            --recurse=yes
+            --exclude=.git
+            --exclude=build
+            --exclude=.idea
+            --exclude=\*.swp
+            --exclude=\*.bak
+            --exclude=\*.pyc
+        """
+
+        try:
+            with open(self.conf, 'w+') as f:
+                f.write(inspect.cleandoc(config))
+
+            shutil.chown(self.conf, WHOAMI, WHOAMI)
+        except:
+            pass
 
 
 class DTGcc(DevToolDeploy):
@@ -533,7 +553,7 @@ if __name__ == "__main__":
             ""
         )),
 
-        DTCscope(DevToolDescriptor(
+        DTCtags(DevToolDescriptor(
             "universal-ctags",
             "ctags",
             ""

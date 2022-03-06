@@ -65,13 +65,24 @@ class DTUtils:
     def parseArgs():
         parser = argparse.ArgumentParser(description="DevTools deployment")
 
-        parser.add_argument('dtools', metavar='TOOL', type=str, nargs='+',
+        parser.add_argument('dtools', metavar='TOOL', type=str, nargs='*',
                             help="tools will be installed")
         parser.add_argument('-u', '--uninst', dest='uninst',
                             action='store_true', default=False,
                             help="uninstall the tools you specified")
+        parser.add_argument('-l', '--list', dest='whatprovided',
+                            action='store_true', default=False,
+                            help="list all of tools you can deploy by this way")
 
         return parser.parse_args()
+
+    @staticmethod
+    def list_all(dt_list):
+        pr_okay(f"You could install the following dev tools by this way so far")
+        print("\n")
+        for dt in dt_list:
+            pr_okay(f"\t{dt.dtd.cmd}")
+        print("\n")
 
     @staticmethod
     def git_shallow_clone(dtd):
@@ -601,6 +612,9 @@ if __name__ == "__main__":
             os.path.join(HOME, ".vim_runtime")
         )),
     ]
+
+    if args.whatprovided:
+        DTUtils.list_all(dt_list)
 
     for dt in dt_list:
         if dt.dtd.cmd in args.dtools:

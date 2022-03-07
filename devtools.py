@@ -247,6 +247,11 @@ class DevToolDeploy:
             pr_failure(f"Failed to apt-get purge {self.dtd.pkgname}")
 
 
+class DTAck(DevToolDeploy):
+    def __init__(self, dtd):
+        DevToolDeploy.__init__(self, dtd)
+
+
 class DTAutojump(DevToolDeploy):
     def __init__(self, dtd):
         DevToolDeploy.__init__(self, dtd)
@@ -535,6 +540,12 @@ if __name__ == "__main__":
     args = DTUtils.parseArgs()
 
     dt_list = [
+        DTAck(DevToolDescriptor(
+            "ack",
+            "ack",
+            ""
+        )),
+
         DTAutojump(DevToolDescriptor(
             "autojump",
             "autojump",

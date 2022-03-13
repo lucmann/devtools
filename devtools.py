@@ -321,7 +321,15 @@ class DTFzf(DevToolDeploy):
             pr_failure(f"Failed to install {self.dtd.cmd}")
 
     def uninstall(self):
-        shutil.rmtree(self.dtd.prefix, ignore_errors=True)
+        fzf_uninstaller = os.path.join(self.dtd.prefix, "uninstall")
+
+        try:
+            proc = Popen([fzf_uninstaller], shell=True)
+            (stdout, stderr) = proc.communicate()
+        except:
+            pr_failure(f"Failed to exec {fzf_uninstaller}")
+        finally:
+            shutil.rmtree(self.dtd.prefix, ignore_errors=True)
 
 
 class DTGcc(DevToolDeploy):

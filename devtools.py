@@ -331,6 +331,21 @@ class DTFzf(DevToolDeploy):
         finally:
             shutil.rmtree(self.dtd.prefix, ignore_errors=True)
 
+    def configure(self):
+        vimrc = os.path.join(HOME, ".vimrc")
+        appended_line = "set runtimepath+=~/.fzf"
+
+        try:
+            with open(vimrc, 'r') as f:
+                for line in f:
+                    if appended_line in line:
+                        return
+
+            with open(vimrc, 'a+') as f:
+                f.write(appended_line)
+        except:
+            pr_failure(f"Failed to install fzf.vim plugin")
+
 
 class DTGcc(DevToolDeploy):
     def __init__(self, dtd):

@@ -114,7 +114,7 @@ class DevToolDescriptor:
                  pkgname,
                  cmd,
                  version,
-                 min_version=None,
+                 min_version='',
                  url=None,
                  branch='',
                  prefix=None,

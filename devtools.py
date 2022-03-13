@@ -140,14 +140,6 @@ class DevToolDeploy:
         self.dtd = dtd                  # type: DevToolDescriptor
 
     def deploy(self, uninst):
-        if self.need_root():
-            if os.getuid() != 0:
-                pr_failure(f"You need to be root to run this application")
-                sys.exit(1)
-        else:
-            if os.getuid() == 0:
-                pr_warning(f"You are privileged but don't have to")
-
         if uninst:
             if self.exists():
                 self.uninstall()
@@ -173,15 +165,6 @@ class DevToolDeploy:
     """
     These operations can be overrided in the subclass
     """
-
-    def need_root(self):
-        """
-        In terms of tools installed by apt-get, this is true.
-        But not everything
-        """
-
-        return True
-
     def exists(self):
         curr_ver_unknown = False
         try:
@@ -227,7 +210,7 @@ class DevToolDeploy:
 
     def install(self):
         try:
-            proc = Popen(['apt-get', 'install', '-y', self.dtd.pkgname])
+            proc = Popen(['sudo', 'apt-get', 'install', '-y', self.dtd.pkgname])
             (stdout, stderr) = proc.communicate()
         except Exception:
             pr_failure(f"Failed to apt-get install {self.dtd.pkgname}")
@@ -240,7 +223,7 @@ class DevToolDeploy:
 
     def uninstall(self):
         try:
-            proc = Popen(['apt-get', 'purge', self.dtd.pkgname])
+            proc = Popen(['sudo', 'apt-get', 'purge', self.dtd.pkgname])
             (stdout, stderr) = proc.communicate()
         except Exception:
             pr_failure(f"Failed to apt-get purge {self.dtd.pkgname}")
@@ -386,13 +369,6 @@ class DTOhMyZsh(DevToolDeploy):
     def __init__(self, dtd):
         DevToolDeploy.__init__(self, dtd)
 
-    def need_root(self):
-        """
-        Oh-my-zsh usually resides your home
-        """
-
-        return False
-
     def exists(self):
         if os.path.exists(self.dtd.prefix):
             return True
@@ -443,13 +419,6 @@ class DTTpm(DevToolDeploy):
         DevToolDeploy.__init__(self, dtd)
         self.conf = os.path.join(HOME, ".tmux.conf")
 
-    def need_root(self):
-        """
-        cloned in ~/.tmux/plugins/tpm
-        """
-
-        return False
-
     def exists(self):
         if os.path.exists(self.dtd.prefix):
             return True
@@ -492,9 +461,6 @@ class DTVimrc(DevToolDeploy):
         DevToolDeploy.__init__(self, dtd)
         self.rc = os.path.join(HOME, ".vimrc")
         self.rc_bak = os.path.join(HOME, '.vimrc.orig')
-
-    def need_root(self):
-        return False
 
     def exists(self):
         if os.path.exists(self.dtd.prefix):

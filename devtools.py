@@ -174,8 +174,14 @@ class DevToolDeploy:
             (stdout, stderr) = proc.communicate()
 
             try:
-                self.dtd.curr_version = re.search(r"\d+\.\d+(\.\d+)?",
-                                                  stdout).group(0)
+                command_not_found = re.search(r"command not found",
+                                              stderr, re.IGNORECASE).group(0)
+
+                if command_not_found is None:
+                    self.dtd.curr_version = re.search(r"\d+\.\d+(\.\d+)?",
+                                                      stdout).group(0)
+                else:
+                    return False
             except AttributeError:
                 curr_ver_unknown = True
 

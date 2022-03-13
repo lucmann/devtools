@@ -175,8 +175,7 @@ class DevToolDeploy:
 
             try:
                 command_not_found = re.search(r"command not found",
-                                              stderr, re.IGNORECASE).group(0)
-
+                                              stderr, re.IGNORECASE)
                 if command_not_found is None:
                     self.dtd.curr_version = re.search(r"\d+\.\d+(\.\d+)?",
                                                       stdout).group(0)
@@ -186,7 +185,7 @@ class DevToolDeploy:
                 curr_ver_unknown = True
 
             # Do not care the version of program
-            if self.dtd.min_version is None:
+            if len(self.dtd.min_version) == 0:
                 return True
 
             if proc.returncode != 0 or curr_ver_unknown:
@@ -303,6 +302,26 @@ class DTCtags(DevToolDeploy):
             shutil.chown(self.conf, WHOAMI, WHOAMI)
         except:
             pass
+
+
+class DTFzf(DevToolDeploy):
+    def __init__(self, dtd):
+        DevToolDeploy.__init__(self, dtd)
+
+    def download(self):
+        return DTUtils.git_shallow_clone(self.dtd)
+
+    def install(self):
+        fzf_installer = os.path.join(self.dtd.prefix, "install")
+
+        try:
+            inst_proc = Popen([fzf_installer], shell=True)
+            (stdout, stderr) = inst_proc.communicate()
+        except:
+            pr_failure(f"Failed to install {self.dtd.cmd}")
+
+    def uninstall(self):
+        shutil.rmtree(self.dtd.prefix, ignore_errors=True)
 
 
 class DTGcc(DevToolDeploy):
@@ -539,6 +558,16 @@ if __name__ == "__main__":
             "universal-ctags",
             "ctags",
             ""
+        )),
+
+        DTFzf(DevToolDescriptor(
+            "fzf",
+            "fzf",
+            "",
+            "",
+            "git@github.com:junegunn/fzf.git",
+            "",
+            os.path.join(HOME, ".fzf")
         )),
 
         DTGcc(DevToolDescriptor(

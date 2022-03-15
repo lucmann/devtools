@@ -238,6 +238,11 @@ class DTAck(DevToolDeploy):
     def __init__(self, dtd):
         DevToolDeploy.__init__(self, dtd)
 
+# the silver searcher ag
+class DTAg(DevToolDeploy):
+    def __init__(self, dtd):
+        DevToolDeploy.__init__(self, dtd)
+
 
 class DTAutojump(DevToolDeploy):
     def __init__(self, dtd):
@@ -556,6 +561,12 @@ if __name__ == "__main__":
         DTAck(DevToolDescriptor(
             "ack",
             "ack",
+            ""
+        )),
+
+        DTAg(DevToolDescriptor(
+            "silversearcher-ag",
+            "ag",
             ""
         )),
 

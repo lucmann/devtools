@@ -639,21 +639,6 @@ if __name__ == "__main__":
             ""
         )),
 
-        # it is kind of weird to add pip to the list, but anyway
-        # love python, love pip
-        DTPip3(DevToolDescriptor(
-            "python3-pip",
-            "pip3",
-            ""
-        )),
-
-        DTZsh(DevToolDescriptor(
-            "zsh",
-            "zsh",
-            "",
-            "5.0.8"
-        )),
-
         DTOhMyZsh(DevToolDescriptor(
             "ohmyzsh",
             "ohmyzsh",
@@ -662,6 +647,14 @@ if __name__ == "__main__":
             "git@github.com:ohmyzsh/ohmyzsh.git",
             "",
             os.path.join(HOME, ".oh-my-zsh")
+        )),
+
+        # it is kind of weird to add pip to the list, but anyway
+        # love python, love pip
+        DTPip3(DevToolDescriptor(
+            "python3-pip",
+            "pip3",
+            ""
         )),
 
         DTTmux(DevToolDescriptor(
@@ -688,6 +681,13 @@ if __name__ == "__main__":
             "git@github.com:lucmann/vimrc.git",
             "cscope-maps",
             os.path.join(HOME, ".vim_runtime")
+        )),
+
+        DTZsh(DevToolDescriptor(
+            "zsh",
+            "zsh",
+            "",
+            "5.0.8"
         )),
     ]
 

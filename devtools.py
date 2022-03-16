@@ -377,6 +377,11 @@ class DTMeson(DevToolDeploy):
         DevToolDeploy.__init__(self, dtd)
 
 
+class DTPip3(DevToolDeploy):
+    def __init__(self, dtd):
+        DevToolDeploy.__init__(self, dtd)
+
+
 class DTTmux(DevToolDeploy):
     def __init__(self, dtd):
         DevToolDeploy.__init__(self, dtd)
@@ -631,6 +636,14 @@ if __name__ == "__main__":
         DTMeson(DevToolDescriptor(
             "meson",
             "meson",
+            ""
+        )),
+
+        # it is kind of weird to add pip to the list, but anyway
+        # love python, love pip
+        DTPip3(DevToolDescriptor(
+            "python3-pip",
+            "pip3",
             ""
         )),
 
